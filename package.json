@@ -1,0 +1,32 @@
+{
+  "name": "ghent-squash-booker",
+  "version": "0.0.1",
+  "description": "",
+  "author": "Robin Wijnant",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "tsc",
+    "dev": "node --env-file=.env -r ts-node/register src/main.ts",
+    "start": "node dist/main.js",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" --fix"
+  },
+  "dependencies": {
+    "envalid": "8.0.0",
+    "puppeteer": "22.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.27",
+    "@typescript-eslint/eslint-plugin": "6.21.0",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-config-standard-with-typescript": "43.0.1",
+    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-n": "16.6.2",
+    "eslint-plugin-promise": "6.1.1",
+    "prettier": "3.2.5",
+    "ts-node": "10.9.2",
+    "typescript": "5.3.3"
+  }
+}
