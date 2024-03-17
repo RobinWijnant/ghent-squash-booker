@@ -1,5 +1,5 @@
-import * as home from "./actions/home";
-import * as history from "./actions/history";
+import * as home from "./pages/home";
+import * as history from "./pages/history";
 import env from "./utils/env";
 import { getBrowser, getPage } from "./utils/puppeteer";
 
@@ -10,9 +10,11 @@ async function main(): Promise<void> {
   await home.go(page, env.BASE_URL);
   await home.acceptCookies(page);
   await home.login(page, env.USERNAME, env.PASSWORD);
+  console.log("Login successful");
 
   await history.go(page, env.BASE_URL);
-  await history.getLastBookingDate(page);
+  const lastBookingDate = await history.getLastBookingDate(page);
+  console.log("Last booking date:", lastBookingDate?.toLocaleString());
 
   await page.waitForSelector("#loool", { timeout: 60 * 60 * 1000 });
 }

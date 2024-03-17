@@ -12,20 +12,18 @@ export async function acceptCookies(page: Page): Promise<void> {
   });
 }
 
-export async function login(page: Page, username: string, password: string): Promise<void> {
+export async function login(
+  page: Page,
+  username: string,
+  password: string,
+): Promise<void> {
   await page.waitForSelector("#MainContent_ctlLoginWidget_txtUsername", {
     visible: true,
   });
-  await page.type(
-    "#MainContent_ctlLoginWidget_txtUsername",
-    username
-  );
-  await page.type(
-    "#MainContent_ctlLoginWidget_txtPassword",
-    password
-  );
+  await page.type("#MainContent_ctlLoginWidget_txtUsername", username);
+  await page.type("#MainContent_ctlLoginWidget_txtPassword", password);
   await Promise.all([
     page.click("input[type='submit'][value='Inloggen']"),
-    page.waitForNavigation({ waitUntil: "domcontentloaded" })
-  ])
-};
+    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+  ]);
+}
