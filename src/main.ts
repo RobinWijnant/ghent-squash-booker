@@ -1,7 +1,9 @@
 import * as home from "./pages/home";
 import * as history from "./pages/history";
+import * as reservations from "./pages/reservations";
 import env from "./utils/env";
 import { getBrowser, getPage } from "./utils/puppeteer";
+import { DayOfWeek, getLastBookingDayInWindow } from "./utils/date";
 
 async function main(): Promise<void> {
   const browser = await getBrowser();
@@ -14,7 +16,26 @@ async function main(): Promise<void> {
 
   await history.go(page, env.BASE_URL);
   const lastBookingDate = await history.getLastBookingDate(page);
-  console.log("Last booking date:", lastBookingDate?.toLocaleString());
+  console.log("Last booked date:", lastBookingDate?.toLocaleString());
+
+  const nextBookingDate = getLastBookingDayInWindow(
+    new Date(),
+    DayOfWeek.Tuesday,
+    "18:30",
+    30
+  );
+  console.log("Next booking date:", nextBookingDate.toLocaleString());
+
+  if (
+    lastBookingDate !== undefined &&
+    lastBookingDate.getTime() === nextBookingDate.getTime()
+  ) {
+    console.warn("Already booked");
+    return;
+  }
+
+  await reservations.go(page, env.BASE_URL);
+  await reservations.applySquashAndDateFilter(page, nextBookingDate);
 
   await page.waitForSelector("#loool", { timeout: 60 * 60 * 1000 });
 }
