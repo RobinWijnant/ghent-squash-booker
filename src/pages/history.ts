@@ -22,7 +22,7 @@ export async function getLastBookingDate(
   const reservationDateCellStrings = await page.evaluate((selector) => {
     const reservationTable = document.querySelector(selector);
 
-    if (reservationTable === null)
+    if (!reservationTable)
       throw new Error("Could not find the reservation table");
 
     const dateCells = Array.from(

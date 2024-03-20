@@ -2,17 +2,14 @@ import { type Page } from "puppeteer";
 import {
   selectFromDropdown,
   waitForOptionInDropdown,
-} from "../utils/puppeteer";
-import { GhentDatePickerMonth } from "../utils/date";
+} from "../../utils/puppeteer";
+import { GhentDatePickerMonth } from "../../utils/date";
 
 export async function go(page: Page, baseUrl: string): Promise<void> {
   await page.goto(`${baseUrl}/Bookings/Overview`);
 }
 
-export async function applySquashAndDateFilter(
-  page: Page,
-  startDate: Date
-): Promise<void> {
+export async function filterByDate(page: Page, startDate: Date): Promise<void> {
   const locationDropdownSelector =
     "select#MainContent_ctlQuickBookingSearch_ddlLocation";
   await page.waitForSelector(locationDropdownSelector);
@@ -35,6 +32,10 @@ export async function applySquashAndDateFilter(
   await page.waitForSelector(datePickerSelector, { visible: true });
 
   await selectDateFromDatePicker(page, startDate);
+
+  const searchButtonSelector =
+    "input#MainContent_ctlQuickBookingSearch_btnSearch";
+  await page.click(searchButtonSelector);
 }
 
 async function selectDateFromDatePicker(page: Page, date: Date): Promise<void> {
@@ -57,5 +58,22 @@ async function selectDateFromDatePicker(page: Page, date: Date): Promise<void> {
 
   await page.waitForSelector(monthYearSelector, { visible: false });
 
-  const dayButtonSelector = `#ctl00_MainContent_ctlQuickBookingSearch_rdpReservationDate_calendar_Top `;
+  const dayButtonSelector = `#ctl00_MainContent_ctlQuickBookingSearch_rdpReservationDate_calendar_Top`;
+  await page.evaluate(
+    (dayButtonSelector, date) => {
+      const dayButton = Array.from(
+        document.querySelectorAll(`${dayButtonSelector} td a`)
+      ).find((element) => element.innerHTML.includes(date.toString())) as
+        | HTMLAnchorElement
+        | undefined;
+
+      if (!dayButton) {
+        throw new Error(`Could not find day ${date} in date picker`);
+      }
+
+      dayButton.click();
+    },
+    dayButtonSelector,
+    date.getDate()
+  );
 }

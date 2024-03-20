@@ -1,6 +1,6 @@
 import * as home from "./pages/home";
 import * as history from "./pages/history";
-import * as reservations from "./pages/reservations";
+import * as bookings from "./pages/bookings";
 import env from "./utils/env";
 import { getBrowser, getPage } from "./utils/puppeteer";
 import { DayOfWeek, getLastBookingDayInWindow } from "./utils/date";
@@ -20,7 +20,7 @@ async function main(): Promise<void> {
 
   const nextBookingDate = getLastBookingDayInWindow(
     new Date(),
-    DayOfWeek.Tuesday,
+    DayOfWeek.Thursday,
     "18:30",
     30
   );
@@ -34,8 +34,9 @@ async function main(): Promise<void> {
     return;
   }
 
-  await reservations.go(page, env.BASE_URL);
-  await reservations.applySquashAndDateFilter(page, nextBookingDate);
+  await bookings.overview.go(page, env.BASE_URL);
+  await bookings.overview.filterByDate(page, nextBookingDate);
+  await bookings.detail.selectTimeSlot(page, nextBookingDate);
 
   await page.waitForSelector("#loool", { timeout: 60 * 60 * 1000 });
 }
