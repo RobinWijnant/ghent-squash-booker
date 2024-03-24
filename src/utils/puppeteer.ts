@@ -8,7 +8,7 @@ export async function getBrowser(): Promise<Browser> {
       "--disable-dev-shm-usage",
       "--lang=nl",
     ],
-    headless: false,
+    headless: true,
     defaultViewport: { height: 720, width: 1280 },
   });
 }
