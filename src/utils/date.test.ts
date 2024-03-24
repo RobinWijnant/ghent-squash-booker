@@ -30,3 +30,17 @@ test("when today is 2024-03-18 20:00 and the booking should be on Wednesday 18:3
     new Date("2024-04-17T18:30:00").toLocaleString()
   );
 });
+
+test.only("when today is 2024-03-24 20:00 and the booking should be on Thursday 18:30 then the last Thursday in 30 days is 2024-04-18", () => {
+  const result = getLastBookingDayInWindow(
+    new Date("2024-03-24T20:00:00"),
+    DayOfWeek.Thursday,
+    "18:30",
+    30
+  );
+
+  assert.equal(
+    result.toLocaleString(),
+    new Date("2024-04-18T18:30:00").toLocaleString()
+  );
+});

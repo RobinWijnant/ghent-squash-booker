@@ -23,10 +23,6 @@ export enum GhentDatePickerMonth {
   dec = 11,
 }
 
-function createDateAndTime(date: Date, time: string): Date {
-  return new Date(`${date.toISOString().split("T")[0]}T${time}`);
-}
-
 export function getLastBookingDayInWindow(
   input: Date,
   bookingDayOfWeek: DayOfWeek,
@@ -42,18 +38,15 @@ export function getLastBookingDayInWindow(
     input.getTime() + windowInDays * 24 * 60 * 60 * 1000
   );
 
-  let dayDiff = bookingDayOfWeek - inputPlus30Days.getDay();
-
-  if (
-    inputPlus30Days.getDay() === bookingDayOfWeek &&
-    input.getTime() < createDateAndTime(new Date(), bookingStartTime).getTime()
+  let iteratorDate = new Date(
+    `${inputPlus30Days.toISOString().split("T")[0]}T${bookingStartTime}`
+  );
+  while (
+    iteratorDate.getDay() !== bookingDayOfWeek ||
+    iteratorDate > inputPlus30Days
   ) {
-    dayDiff = -7;
+    iteratorDate = new Date(iteratorDate.getTime() - 24 * 60 * 60 * 1000);
   }
 
-  const lastBookingDayInWindow = new Date(
-    inputPlus30Days.getTime() + dayDiff * 24 * 60 * 60 * 1000
-  );
-
-  return createDateAndTime(lastBookingDayInWindow, bookingStartTime);
+  return iteratorDate;
 }

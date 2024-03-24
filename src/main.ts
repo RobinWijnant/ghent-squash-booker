@@ -21,7 +21,7 @@ async function main(): Promise<void> {
   const nextBookingDate = getLastBookingDayInWindow(
     new Date(),
     DayOfWeek.Thursday,
-    "08:00",
+    "18:30",
     30
   );
   console.log("Next booking date:", nextBookingDate.toLocaleString());
@@ -34,9 +34,10 @@ async function main(): Promise<void> {
     return;
   }
 
-  await bookings.overview.go(page, env.BASE_URL);
-  await bookings.overview.filterByDate(page, nextBookingDate);
-  await bookings.detail.selectTimeSlot(page, nextBookingDate);
+  await bookings.go(page, env.BASE_URL);
+  await bookings.filterByDate(page, nextBookingDate);
+  await bookings.selectTimeSlot(page, nextBookingDate);
+  await bookings.confirmBooking(page);
 
   await page.waitForSelector("#loool", { timeout: 60 * 60 * 1000 });
 }
