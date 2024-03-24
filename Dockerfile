@@ -25,8 +25,10 @@ COPY --chown=node:node package-lock.json ./
 USER node
 
 RUN npm install
+
+COPY --chown=node:node . .
+
 RUN npm run build
 RUN npm prune --production
 
-EXPOSE 8080
 CMD [ "npm", "run", "start" ]
