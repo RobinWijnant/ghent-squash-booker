@@ -20,7 +20,7 @@ async function main(): Promise<void> {
 
   const nextBookingDate = getLastBookingDayInWindow(
     new Date(),
-    DayOfWeek.Thursday,
+    DayOfWeek.Tuesday,
     "18:30",
     30
   );
