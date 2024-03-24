@@ -4,7 +4,7 @@ export async function selectTimeSlot(page: Page, date: Date): Promise<void> {
   const fields = [4, 3, 2, 1];
 
   for (const fieldIndex of fields) {
-    const startTime = `${date.getHours()}:${date.getMinutes()}`;
+    const startTime = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
     const startTimeCellSelector = `table.TimeSheet-table td[data-row="${fieldIndex}"][data-stime="${startTime}"]`;
     const startTimeCell = await page.waitForSelector(startTimeCellSelector);
     const isTimeSlotBooked = await page.$(
@@ -15,26 +15,32 @@ export async function selectTimeSlot(page: Page, date: Date): Promise<void> {
       continue;
     }
 
-    const endDate = new Date(date.getTime() + 45 * 60 * 1000);
-    const endTime = `${endDate.getHours()}:${endDate.getMinutes()}`;
-    const endTimeCellSelector = `table.TimeSheet-table td[data-row="${fieldIndex}"][data-stime="${endTime}"]`;
-    const endTimeCell = await page.waitForSelector(endTimeCellSelector);
+    const endSlotDate = new Date(date.getTime() + 30 * 60 * 1000);
+    const endSlotTime = `${String(endSlotDate.getHours()).padStart(2, "0")}:${String(endSlotDate.getMinutes()).padStart(2, "0")}`;
+    const endTimeSlotCellSelector = `table.TimeSheet-table td[data-row="${fieldIndex}"][data-stime="${endSlotTime}"]`;
+    const endTimeSlotCell = await page.waitForSelector(endTimeSlotCellSelector);
 
-    const startTimeCellBoundingBox = await startTimeCell?.boundingBox();
-    const endTimeCellBoundingBox = await endTimeCell?.boundingBox();
+    const startTimeSlotCellBoundingBox = await startTimeCell?.boundingBox();
+    const endTimeSlotCellBoundingBox = await endTimeSlotCell?.boundingBox();
 
-    if (!startTimeCellBoundingBox || !endTimeCellBoundingBox) {
+    if (!startTimeSlotCellBoundingBox || !endTimeSlotCellBoundingBox) {
       throw new Error(
         "Could not find the start or end time cell in time slot table"
       );
     }
 
-    // does not work yet
-    await page.mouse.dragAndDrop(
-      startTimeCellBoundingBox,
-      endTimeCellBoundingBox,
-      { delay: 10 }
+    await page.mouse.move(
+      startTimeSlotCellBoundingBox.x + startTimeSlotCellBoundingBox.width / 2,
+      startTimeSlotCellBoundingBox.y + startTimeSlotCellBoundingBox.height / 2
     );
+    await page.mouse.down();
+    await page.mouse.move(
+      endTimeSlotCellBoundingBox.x + endTimeSlotCellBoundingBox.width / 2,
+      endTimeSlotCellBoundingBox.y + endTimeSlotCellBoundingBox.height / 2
+    );
+    await page.mouse.up();
+
+    return;
   }
 
   throw new Error(

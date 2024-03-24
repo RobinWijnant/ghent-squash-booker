@@ -21,7 +21,7 @@ async function main(): Promise<void> {
   const nextBookingDate = getLastBookingDayInWindow(
     new Date(),
     DayOfWeek.Thursday,
-    "18:30",
+    "08:00",
     30
   );
   console.log("Next booking date:", nextBookingDate.toLocaleString());
