@@ -10,8 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: ghent-squash-booker
-      GCP_REGION: europe-west1
+      GCP_REPOSITORY: ghent-squash-booker
       GCP_PROJECT: ghent-squash-booker
+      GCP_REGION: europe-west1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,12 +27,12 @@ jobs:
           export_default_credentials: true
 
       - name: Build Docker image
-        run: docker build -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
+        run: docker build -t ${{ env.IMAGE_NAME }} .
 
       - name: Configure Docker Client
         run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
 
       - name: Push Docker image to Artifact Registry
         run: |-
-          docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker push ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker tag ${{ env.IMAGE_NAME }} ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.GCP_REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
