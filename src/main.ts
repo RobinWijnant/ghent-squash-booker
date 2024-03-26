@@ -30,12 +30,14 @@ async function main(): Promise<void> {
     lastBookingDate !== undefined &&
     lastBookingDate.getTime() === nextBookingDate.getTime()
   ) {
-    console.warn("Already booked");
+    console.warn("Booking already made for next date");
   } else {
     await bookings.go(page, env.BASE_URL);
     await bookings.filterByDate(page, nextBookingDate);
     await bookings.selectTimeSlot(page, nextBookingDate);
+    console.log("Timeslot selected");
     await bookings.confirmBooking(page);
+    console.log("Booking complete");
   }
 
   await browser.close();
