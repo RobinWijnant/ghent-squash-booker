@@ -26,10 +26,12 @@ jobs:
           export_default_credentials: true
 
       - name: Build Docker image
-        run: docker build -t ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+        run: docker build -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
 
       - name: Configure Docker Client
         run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
 
       - name: Push Docker image to Artifact Registry
-        run: docker push ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        run: |-
+          docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
