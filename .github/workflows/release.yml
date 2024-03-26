@@ -33,5 +33,5 @@ jobs:
 
       - name: Push Docker image to Artifact Registry
         run: |-
-          docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.GCP_REGION }}.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker push ${{ env.GCP_REGION }}.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
