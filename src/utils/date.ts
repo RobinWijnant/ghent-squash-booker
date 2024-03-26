@@ -29,11 +29,6 @@ export function getLastBookingDayInWindow(
   bookingStartTime: string,
   windowInDays: number = 30
 ): Date {
-  const bookingStartTimeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/; // HH:MM
-  if (!bookingStartTimeRegex.test(bookingStartTime)) {
-    throw new Error("Invalid bookingStartTime format");
-  }
-
   const inputPlus30Days = new Date(
     input.getTime() + windowInDays * 24 * 60 * 60 * 1000
   );

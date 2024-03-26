@@ -3,7 +3,7 @@ import * as history from "./pages/history";
 import * as bookings from "./pages/bookings";
 import env from "./utils/env";
 import { getBrowser, getPage } from "./utils/puppeteer";
-import { DayOfWeek, getLastBookingDayInWindow } from "./utils/date";
+import { getLastBookingDayInWindow } from "./utils/date";
 
 async function main(): Promise<void> {
   const browser = await getBrowser();
@@ -20,8 +20,8 @@ async function main(): Promise<void> {
 
   const nextBookingDate = getLastBookingDayInWindow(
     new Date(),
-    DayOfWeek.Tuesday,
-    "18:30",
+    env.BOOKING_DAY_OF_WEEK,
+    env.BOOKING_TIME,
     30
   );
   console.log("Next booking date:", nextBookingDate.toLocaleString());
@@ -31,15 +31,14 @@ async function main(): Promise<void> {
     lastBookingDate.getTime() === nextBookingDate.getTime()
   ) {
     console.warn("Already booked");
-    return;
+  } else {
+    await bookings.go(page, env.BASE_URL);
+    await bookings.filterByDate(page, nextBookingDate);
+    await bookings.selectTimeSlot(page, nextBookingDate);
+    await bookings.confirmBooking(page);
   }
 
-  await bookings.go(page, env.BASE_URL);
-  await bookings.filterByDate(page, nextBookingDate);
-  await bookings.selectTimeSlot(page, nextBookingDate);
-  await bookings.confirmBooking(page);
-
-  await page.waitForSelector("#loool", { timeout: 60 * 60 * 1000 });
+  await browser.close();
 }
 
 main().catch((error) => {

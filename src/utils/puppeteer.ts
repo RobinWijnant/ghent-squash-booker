@@ -1,4 +1,5 @@
 import puppeteer, { type Page, type Browser } from "puppeteer";
+import env from "./env";
 
 export async function getBrowser(): Promise<Browser> {
   return await puppeteer.launch({
@@ -8,8 +9,9 @@ export async function getBrowser(): Promise<Browser> {
       "--disable-dev-shm-usage",
       "--lang=nl",
     ],
-    headless: true,
+    headless: env.HEADLESS_BROWSER,
     defaultViewport: { height: 720, width: 1280 },
+    executablePath: env.PUPPETEER_PATH,
   });
 }
 
