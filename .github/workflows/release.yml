@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: ghent-squash-booker
+      GCP_REGION: europe-west1
       GCP_PROJECT: ghent-squash-booker
     steps:
       - name: Checkout
@@ -32,5 +33,5 @@ jobs:
 
       - name: Push Docker image to Artifact Registry
         run: |-
-          docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} europe-docker.pkg.dev/${{ env.GCP_PROJECT }}/docker/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker push europe-docker.pkg.dev/${{ env.GCP_PROJECT }}/docker/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.GCP_REGION }}.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.GCP_REGION }}.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
