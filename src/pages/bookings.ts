@@ -81,7 +81,6 @@ async function selectDateFromDatePicker(page: Page, date: Date): Promise<void> {
 
 export async function selectTimeSlot(page: Page, date: Date): Promise<void> {
   const fields = [4, 3, 2, 1];
-  let isTimeSlotAvailable = false;
 
   for (const fieldIndex of fields) {
     const startTime = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
@@ -120,14 +119,12 @@ export async function selectTimeSlot(page: Page, date: Date): Promise<void> {
     );
     await page.mouse.up();
 
-    isTimeSlotAvailable = true;
+    return;
   }
 
-  if (!isTimeSlotAvailable) {
-    throw new Error(
-      `Could not find an available time slot for ${date.toLocaleString()}`
-    );
-  }
+  throw new Error(
+    `Could not find an available time slot for ${date.toLocaleString()}`
+  );
 }
 
 export async function confirmBooking(page: Page): Promise<void> {
