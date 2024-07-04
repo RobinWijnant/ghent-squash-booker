@@ -14,10 +14,6 @@ async function main(): Promise<void> {
   await home.login(page, env.USERNAME, env.PASSWORD);
   console.log("Login successful");
 
-  await history.go(page, env.BASE_URL);
-  const lastBookingDate = await history.getLastBookingDate(page);
-  console.log("Last booked date:", lastBookingDate?.toLocaleString());
-
   const nextBookingDate = getLastBookingDayInWindow(
     new Date(),
     env.BOOKING_DAY_OF_WEEK,
@@ -25,6 +21,13 @@ async function main(): Promise<void> {
     30
   );
   console.log("Next booking date:", nextBookingDate.toLocaleString());
+
+  await history.go(page, env.BASE_URL);
+  const lastBookingDate = await history.getLastBookingDate(
+    page,
+    nextBookingDate
+  );
+  console.log("Last booked date:", lastBookingDate?.toLocaleString());
 
   if (
     lastBookingDate !== undefined &&

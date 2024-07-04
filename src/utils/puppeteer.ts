@@ -1,5 +1,6 @@
 import puppeteer, { type Page, type Browser } from "puppeteer";
 import env from "./env";
+import { GhentDatePickerMonth } from "../utils/date";
 
 export async function getBrowser(): Promise<Browser> {
   return await puppeteer.launch({
@@ -62,5 +63,54 @@ export async function waitForOptionInDropdown(
     {},
     selector,
     textValue
+  );
+}
+
+export async function selectDateFromDatePicker(
+  page: Page,
+  date: Date,
+  baseId: string
+): Promise<void> {
+  const datePickerButtonSelector = `${baseId}_popupButton`;
+  await page.click(datePickerButtonSelector);
+
+  const datePickerSelector = `${baseId}_calendar`;
+  await page.waitForSelector(datePickerSelector, { visible: true });
+
+  const monthYearButtonSelector = `${baseId}_calendar_Title`;
+  await page.click(monthYearButtonSelector);
+
+  const monthYearSelector = `${baseId}_calendar_FastNavPopup`;
+  await page.waitForSelector(monthYearSelector, { visible: true });
+
+  const yearButtonSelector = `${monthYearSelector} #rcMView_${date.getFullYear()}`;
+  await page.click(yearButtonSelector);
+
+  const monthButtonSelector = `${monthYearSelector} #rcMView_${GhentDatePickerMonth[date.getMonth()]}`;
+  await page.click(monthButtonSelector);
+
+  const monthYearSubmitButtonSelector = `${monthYearSelector} #rcMView_OK`;
+  await page.click(monthYearSubmitButtonSelector);
+
+  const dayButtonSelector = `${baseId}_calendar_Top`;
+  await page.waitForSelector(dayButtonSelector, { visible: true });
+  await page.evaluate(
+    (dayButtonSelector, date) => {
+      const dayButton = Array.from(
+        document.querySelectorAll(
+          `${dayButtonSelector} td:not(.rcOtherMonth) a`
+        )
+      ).find((element) => element.innerHTML.includes(date.toString())) as
+        | HTMLAnchorElement
+        | undefined;
+
+      if (!dayButton) {
+        throw new Error(`Could not find day ${date} in date picker`);
+      }
+
+      dayButton.click();
+    },
+    dayButtonSelector,
+    date.getDate()
   );
 }

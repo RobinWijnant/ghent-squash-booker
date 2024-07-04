@@ -1,5 +1,8 @@
 import { type Page } from "puppeteer";
-import { selectFromDropdown } from "../utils/puppeteer";
+import {
+  selectFromDropdown,
+  selectDateFromDatePicker,
+} from "../utils/puppeteer";
 
 export async function go(page: Page, baseUrl: string): Promise<void> {
   await page.goto(`${baseUrl}/Profile/MyHistory`);
@@ -9,7 +12,8 @@ const reservationTableSelector =
   "table#ctl00_MainContent_HistoryReservations_gvReservations_ctl00";
 
 export async function getLastBookingDate(
-  page: Page
+  page: Page,
+  dateRangeMax: Date
 ): Promise<Date | undefined> {
   await selectFromDropdown(
     page,
@@ -18,6 +22,16 @@ export async function getLastBookingDate(
   );
 
   await page.waitForSelector(reservationTableSelector, { visible: true });
+
+  await selectDateFromDatePicker(
+    page,
+    dateRangeMax,
+    "#ctl00_MainContent_HistoryReservations_rdpHistoryReservationTill"
+  );
+
+  await page.click("#MainContent_HistoryReservations_btnFilter");
+
+  await page.waitForNetworkIdle();
 
   const reservationDateCellStrings = await page.evaluate((selector) => {
     const reservationTable = document.querySelector(selector);
