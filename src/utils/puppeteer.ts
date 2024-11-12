@@ -19,7 +19,7 @@ export async function getBrowser(): Promise<Browser> {
 export async function getPage(browser: Browser): Promise<Page> {
   const [page] = await browser.pages();
 
-  page.setDefaultTimeout(15 * 1000);
+  page.setDefaultTimeout(30 * 1000);
 
   return page;
 }
