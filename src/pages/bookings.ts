@@ -36,45 +36,26 @@ export async function filterByDate(page: Page, startDate: Date): Promise<void> {
 }
 
 export async function selectTimeSlot(page: Page, date: Date): Promise<void> {
-  const fields = [4, 3, 2, 1];
+  await page.waitForSelector(`.timeline .timeblock`);
 
-  for (const fieldIndex of fields) {
-    const startTime = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
-    const startTimeCellSelector = `table.TimeSheet-table td[data-row="${fieldIndex}"][data-stime="${startTime}"]`;
-    const startTimeCell = await page.waitForSelector(startTimeCellSelector);
-    const isTimeSlotBooked = await page.$(
-      `${startTimeCellSelector}.TimeSheet-cell-booked`
+  const startTime = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+  const targetTimeblockIndex = await page.evaluate((startTime) => {
+    const startTimeTitles = Array.from(
+      document.querySelectorAll(".timeline .timeblock-time")
     );
+    return startTimeTitles.findIndex((title) => title.innerHTML === startTime);
+  }, startTime);
 
-    if (isTimeSlotBooked) {
+  for (const fieldIndex of [4, 3, 2, 1]) {
+    const startTimeCellSelector = `.calendar > div:nth-child(${fieldIndex + 1}) > .block:nth-child(${targetTimeblockIndex + 1})`;
+    const startTimeCellAvailableDiv = await page.$(
+      `${startTimeCellSelector} > .available-block`
+    );
+    if (!startTimeCellAvailableDiv) {
       continue;
     }
 
-    const endSlotDate = new Date(date.getTime() + 30 * 60 * 1000);
-    const endSlotTime = `${String(endSlotDate.getHours()).padStart(2, "0")}:${String(endSlotDate.getMinutes()).padStart(2, "0")}`;
-    const endTimeSlotCellSelector = `table.TimeSheet-table td[data-row="${fieldIndex}"][data-stime="${endSlotTime}"]`;
-    const endTimeSlotCell = await page.waitForSelector(endTimeSlotCellSelector);
-
-    const startTimeSlotCellBoundingBox = await startTimeCell?.boundingBox();
-    const endTimeSlotCellBoundingBox = await endTimeSlotCell?.boundingBox();
-
-    if (!startTimeSlotCellBoundingBox || !endTimeSlotCellBoundingBox) {
-      throw new Error(
-        "Could not find the start or end time cell in time slot table"
-      );
-    }
-
-    await page.mouse.move(
-      startTimeSlotCellBoundingBox.x + startTimeSlotCellBoundingBox.width / 2,
-      startTimeSlotCellBoundingBox.y + startTimeSlotCellBoundingBox.height / 2
-    );
-    await page.mouse.down();
-    await page.mouse.move(
-      endTimeSlotCellBoundingBox.x + endTimeSlotCellBoundingBox.width / 2,
-      endTimeSlotCellBoundingBox.y + endTimeSlotCellBoundingBox.height / 2
-    );
-    await page.mouse.up();
-
+    await page.click(startTimeCellSelector);
     return;
   }
 
@@ -84,32 +65,18 @@ export async function selectTimeSlot(page: Page, date: Date): Promise<void> {
 }
 
 export async function confirmBooking(page: Page): Promise<void> {
-  const confirmButton1Selector = 'a[onclick="return RedirectToRegister();"]';
-  const confirmButton2Selector = "#MainContent_lnkNextStepMakeReservation";
+  const nextButtonSelector = ".flow-navigation > button:nth-child(2)";
 
-  await Promise.all([
-    page.click(confirmButton1Selector),
-    page.waitForSelector(confirmButton2Selector),
-  ]);
+  await page.waitForSelector(".flow-navigation");
+  await page.click(nextButtonSelector);
 
-  const confirmButton3Selector = "#MainContent_lnkSave";
+  await page.waitForSelector(".info-container table td");
+  await page.click(nextButtonSelector);
 
-  await Promise.all([
-    page.click(confirmButton2Selector),
-    page.waitForSelector(confirmButton3Selector),
-  ]);
+  await page.waitForSelector(".summary-card");
+  await page.click(nextButtonSelector);
 
-  const confirmButton4Selector = "#MainContent_btnNextStep";
-
-  await Promise.all([
-    page.click(confirmButton3Selector),
-    page.waitForSelector(confirmButton4Selector),
-  ]);
-
-  const confirmationMessageSelector = "#MainContent_rptBasket_lblItemContent_0";
-
-  await Promise.all([
-    page.click(confirmButton4Selector),
-    page.waitForSelector(confirmationMessageSelector),
-  ]);
+  await page.waitForSelector(".btnCart");
+  await page.click(".btnCart");
+  await page.waitForSelector("#MainContent_rptBasket_lblItemHeader_0");
 }
