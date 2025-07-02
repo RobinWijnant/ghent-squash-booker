@@ -31,7 +31,7 @@ async function main(): Promise<void> {
 
   if (
     lastBookingDate !== undefined &&
-    lastBookingDate.getTime() === nextBookingDate.getTime()
+    lastBookingDate.getTime() >= nextBookingDate.getTime()
   ) {
     console.warn("Booking already made for next date");
   } else {
